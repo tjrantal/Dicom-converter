@@ -1,0 +1,13 @@
+A tool to convert DICOM-video-files exported from ALOKA ultrasound to mjpeg AVIs.
+Depends on libjpeg (I've included the source code in the jpeg-9 -folder).
+
+The libjpeg needs to be compiled first with the typical commands (e.g. in the jpeg-9 folder):
+./configure
+make
+make install
+
+The converter can be compiled subsequently:
+g++ -o save_dicom_mjpeg.exe save_dicom_mjpeg.cpp -static -O3 -march=i686 -ljpeg
+
+The converter is run by calling
+save_dicom_mjpeg sourceDicomFile outpuFile.avi
