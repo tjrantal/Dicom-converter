@@ -11,3 +11,6 @@ g++ -o save_dicom_mjpeg.exe save_dicom_mjpeg.cpp -static -O3 -march=i686 -ljpeg
 
 The converter is run by calling
 save_dicom_mjpeg sourceDicomFile outpuFile.avi
+
+The goal is to use the created avi with matlab and the mjpeg decoder needs to be installed as well (e.g. from ffdshow-tryout. Remember to pick the codec pack that supports your processor (64 or 32 bit) and also, enable the MJPEG codec for direct show).
+http://sourceforge.net/projects/ffdshow-tryout/files/latest/download
