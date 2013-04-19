@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 		
 	//DICOM VALMISTELTU
 	//x264 valmistelu
-	videoWriter ulosVideo(argv[2],videon_leveys,videon_korkeus,PIX_FMT_BGR24);
+	videoWriter ulosVideo(argv[2],videon_leveys,videon_korkeus,PIX_FMT_RGB24);
 	//Lue seuraava DICOM-kuva
 	//Tähän silmukka kuvan hakemiselle
 	
