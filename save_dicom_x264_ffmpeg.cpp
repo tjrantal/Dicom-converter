@@ -22,8 +22,8 @@ int main(int argc, char **argv)
 {
     const char *filename,*filein;
 	unsigned short riveja, kolumneja,videon_korkeus,videon_leveys;
-	videon_korkeus = 496;
-	videon_leveys = 752;
+	videon_korkeus = 512;//496;
+	videon_leveys = 768;//752;
     if (argc < 3) {
         printf("usage: save_dicom_x264_ffmpeg video.dcm output.avi [mpeg1]\n");
         exit(1);
@@ -101,17 +101,17 @@ int main(int argc, char **argv)
 	//Valmistellaan kuva ja näyttö
 	
 	/*Single plane*/
-	/*
+	
 	uint8_t * kuva[1];
 	kuva[0] = new uint8_t[videon_leveys*videon_korkeus*3];
-	*/
-	/*Three planes*/
 	
+	/*Three planes*/
+	/*
 	uint8_t * kuva[3];
 	kuva[0] = new uint8_t[videon_leveys*videon_korkeus];
 	kuva[1] = new uint8_t[videon_leveys*videon_korkeus];
 	kuva[2] = new uint8_t[videon_leveys*videon_korkeus];
-	
+	*/
 	
 	//unsigned char* kuva;
 	
@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 		
 	//DICOM VALMISTELTU
 	//x264 valmistelu
-	videoWriter ulosVideo(argv[2],videon_leveys,videon_korkeus,PIX_FMT_RGB24,compression);
+	videoWriter ulosVideo(argv[2],videon_leveys,videon_korkeus,PIX_FMT_RGB24,compression); //
 	//Lue seuraava DICOM-kuva
 	//Tähän silmukka kuvan hakemiselle
 	
@@ -235,15 +235,32 @@ int main(int argc, char **argv)
 			/*
 			for (int jjj = 0;jjj<videon_korkeus;jjj++){
 				for (int iii = 0;iii<videon_leveys;iii++){
-					kuva[0][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//R
-					kuva[1][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja+riveja*kolumneja];	//G
-					kuva[2][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja+2*riveja*kolumneja];;	//B
+					kuva[0][3*iii+jjj*videon_leveys*3]=vali[iii+jjj*kolumneja];	//R
+					kuva[0][3*iii+1+jjj*videon_leveys*3]=vali[iii+jjj*kolumneja+riveja*kolumneja];	//G
+					kuva[0][3*iii+2+jjj*videon_leveys*3]=vali[iii+jjj*kolumneja+2*riveja*kolumneja];;	//B
 					}
 			}
 			*/
+			/*Single plane planar*/
+			for (int jjj = 0;jjj<videon_korkeus;jjj++){
+				for (int iii = 0;iii<videon_leveys;iii++){
+					if (iii < kolumneja && jjj < riveja){
+						kuva[0][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//R
+						kuva[0][iii+jjj*videon_leveys+videon_leveys*videon_korkeus*1]=vali[iii+jjj*kolumneja+riveja*kolumneja];	//G
+						kuva[0][iii+jjj*videon_leveys+videon_leveys*videon_korkeus*2]=vali[iii+jjj*kolumneja+2*riveja*kolumneja];	//B
+					
+					}else{
+						kuva[0][iii+jjj*videon_leveys]=0;	//R
+						kuva[0][iii+jjj*videon_leveys+videon_leveys*videon_korkeus*1]=0;	//G
+						kuva[0][iii+jjj*videon_leveys+videon_leveys*videon_korkeus*2]=0;	//B
+					}
+				}
+			}
+
+			
 			
 			/*Three planes*/
-			
+			/*
 			for (int jjj = 0;jjj<videon_korkeus;jjj++){
 				for (int iii = 0;iii<videon_leveys;iii++){
 					kuva[0][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//R
@@ -251,7 +268,7 @@ int main(int argc, char **argv)
 					kuva[2][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//B
 					}
 			}
-			
+			*/
 			//Kuva valmis
 			ulosVideo.write_video_frame(kuva);
 			printf("Kuva %u\r",kuvia_naytetty);

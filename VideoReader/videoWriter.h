@@ -162,19 +162,18 @@ void videoWriter::write_video_frame(const  uint8_t *const* imageIn)
 	
     int out_size, ret;
     AVCodecContext *c;
-	const int linesize[3] = {uleveys,uleveys,uleveys};
-	//linesize =new int[3];
+	const int linesize[1] = {uleveys*3};
 	/*
-	for (int i= 0;i<3;++i){
-		linesize[i] = uleveys;
-	}
+	//Three planes
+	const int linesize[3] = {uleveys,uleveys,uleveys};
 	*/
     c = video_st->codec;
 	double pts = (double)video_st->pts.val * video_st->time_base.num /video_st->time_base.den;
+	//printf("PTS calculated\n");
 	if (formatIn != PIX_FMT_YUV420P) {
-			   
+		//printf("Start Scaling\n");	   
 		sws_scale(img_convert_ctx, (const uint8_t * const*)imageIn, linesize, 0, c->height, picture3->data, picture3->linesize);
-				
+		//printf("Scaled successfully\n");	   		
 				
 
         } else {
