@@ -127,7 +127,8 @@ int main(int argc, char **argv)
 		
 	//DICOM VALMISTELTU
 	//x264 valmistelu
-	videoWriter ulosVideo(argv[2],videon_leveys,videon_korkeus,PIX_FMT_RGB24,compression); //
+	videoWriter ulosVideo(argv[2],videon_leveys,videon_korkeus,AV_PIX_FMT_GBRP,compression); //AV_PIX_FMT_GBRP//PIX_FMT_RGB24
+	printf("Ulosvideo\n");
 	//Lue seuraava DICOM-kuva
 	//Tähän silmukka kuvan hakemiselle
 	
@@ -272,22 +273,35 @@ int main(int argc, char **argv)
 			
 			for (int jjj = 0;jjj<videon_korkeus;jjj++){
 				for (int iii = 0;iii<videon_leveys;iii++){
-					kuva[2][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja];	//R = 2
-					kuva[0][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja];	//G = 0
-					kuva[1][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja];	//B = 1
+					if (iii < kolumneja && jjj < riveja){
+						kuva[2][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja+riveja*kolumneja*2];	//R = 2
+						kuva[0][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja];	//G = 0
+						kuva[1][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja+riveja*kolumneja*1];	//B = 1
+					}else{
+						kuva[2][iii+jjj*(videon_leveys+16)]=0;	//R = 2
+						kuva[0][iii+jjj*(videon_leveys+16)]=0;	//G = 0
+						kuva[1][iii+jjj*(videon_leveys+16)]=0;	//B = 1
 					}
+				}
 			}
 			
 			//Kuva valmis
+			//printf("starting to write a frame\n");
 			ulosVideo.write_video_frame(kuva);
-			printf("Kuva %u\r",kuvia_naytetty);
+			//printf("Kuva %u\r",kuvia_naytetty);
 		}
 
 	} //seuraavalle kierrokselle
 			
 	//Tässä on valmista, nollaillaan kaikki
 	ulosVideo.write_trailer();
-	free(kuva);
+	
+	for (int i = 0;i<3;++i){
+		delete kuva[i];
+	}
+	
+	
+	//delete kuva;
 	delete vali;
 	fclose(tie);
 	printf("Valmista tuli\n"); 

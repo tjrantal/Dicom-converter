@@ -30,7 +30,7 @@ class videoWriter
 		int video_outbuf_size;
 		const char* filename;
 		AVFrame *picture3;
-		AVPicture *rgbPict;
+		AVPicture rgbPict;
 		AVPixelFormat src_pix_fmt;
 		AVPixelFormat formatIn;
 		int uleveys, ukorkeus,framesEncoded;
@@ -38,7 +38,7 @@ class videoWriter
 	public:
 		
 		//Function declarations
-		void write_video_frame(const uint8_t *imageIn[]);
+		void write_video_frame(uint8_t *imageIn[]);
 		void write_trailer();
 		videoWriter(const char* fname, int lev, int kor, AVPixelFormat src_pix_fmtIn, char* compression) //Constructor
 		{
@@ -156,20 +156,26 @@ class videoWriter
 				avpicture_fill((AVPicture *)picture3, picture_buf3,
 							   PIX_FMT_YUV420P, uleveys, ukorkeus);
 				picture3->pts = 0;
-				printf("Picture allocoitu\n");
-				avpicture_alloc(rgbPict,src_pix_fmt, uleveys, ukorkeus);
+				printf("Picture allocoitu, yeah\n");
+				if (avpicture_alloc(&rgbPict,src_pix_fmt, uleveys, ukorkeus) <0){
+					printf("Couldn't alloc\n");
+					exit(0);				
+				}
+				printf("RGB pict alloc\n",size);
+				size = avpicture_get_size(src_pix_fmt, uleveys, ukorkeus);
+				printf("RGB pict size %d\n",size);
 				rgb_buf = (uint8_t*) av_malloc(size);
-				avpicture_fill(rgbPict, rgb_buf,
+				avpicture_fill(&rgbPict, rgb_buf,
 							   src_pix_fmt, uleveys, ukorkeus);
 				
 		}
 };
 
-void videoWriter::write_video_frame(const  uint8_t* imageIn[])
+void videoWriter::write_video_frame(uint8_t* imageIn[])
 {
 	printf("start writing frame");
-	//avpicture_fill(rgbPict,imageIn,src_pix_fmt,uleveys,ukorkeus);
-	int linesize[] = {uleveys+16,uleveys+16,uleveys+16};
+	//avpicture_fill(&rgbPict,imageIn,src_pix_fmt,uleveys,ukorkeus);
+	const int linesize[3] = {uleveys+16,uleveys+16,uleveys+16};
     int out_size, ret;
     AVCodecContext *c;
 //	const int linesize[1] = {uleveys*3};
@@ -179,7 +185,7 @@ void videoWriter::write_video_frame(const  uint8_t* imageIn[])
 	//printf("PTS calculated\n");
 	if (formatIn != PIX_FMT_YUV420P) {
 		//printf("Start Scaling\n");	   
-		//sws_scale(img_convert_ctx, rgbPict->data, rgbPict->linesize, 0, c->height, picture3->data, picture3->linesize);
+		//sws_scale(img_convert_ctx, &rgbPict->data, &rgbPict->linesize, 0, c->height, picture3->data, picture3->linesize);
 		sws_scale(img_convert_ctx, imageIn, linesize, 0, c->height, picture3->data, picture3->linesize);
 		//printf("Scaled successfully\n");	   		
 				
