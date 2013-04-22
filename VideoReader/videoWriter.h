@@ -156,12 +156,13 @@ class videoWriter
 				avpicture_fill((AVPicture *)picture3, picture_buf3,
 							   PIX_FMT_YUV420P, uleveys, ukorkeus);
 				picture3->pts = 0;
+				/*
 				printf("Picture allocoitu, yeah\n");
 				if (avpicture_alloc(&rgbPict,src_pix_fmt, uleveys, ukorkeus) <0){
 					printf("Couldn't alloc\n");
 					exit(0);				
 				}
-				/*
+				
 				printf("RGB pict alloc\n",size);
 				size = avpicture_get_size(src_pix_fmt, uleveys, ukorkeus);
 				printf("RGB pict size %d\n",size);

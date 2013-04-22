@@ -275,12 +275,12 @@ int main(int argc, char **argv)
 				for (int iii = 0;iii<videon_leveys;iii++){
 					if (iii < kolumneja && jjj < riveja){
 						kuva[2][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja+riveja*kolumneja*2];	//R = 2
-						kuva[0][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja];	//G = 0
-						kuva[1][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja+riveja*kolumneja*1];	//B = 1
+						kuva[1][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja];	//G = 0
+						kuva[0][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja+riveja*kolumneja*1];	//B = 1
 					}else{
 						kuva[2][iii+jjj*(videon_leveys+16)]=0;	//R = 2
-						kuva[0][iii+jjj*(videon_leveys+16)]=0;	//G = 0
-						kuva[1][iii+jjj*(videon_leveys+16)]=0;	//B = 1
+						kuva[1][iii+jjj*(videon_leveys+16)]=0;	//G = 0
+						kuva[0][iii+jjj*(videon_leveys+16)]=0;	//B = 1
 					}
 				}
 			}
