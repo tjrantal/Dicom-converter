@@ -24,10 +24,16 @@ int main(int argc, char **argv)
 	unsigned short riveja, kolumneja,videon_korkeus,videon_leveys;
 	videon_korkeus = 496;
 	videon_leveys = 752;
-    if (argc != 3) {
-        printf("usage: save_dicom_x264_ffmpeg video.dcm output.avi\n");
+    if (argc < 3) {
+        printf("usage: save_dicom_x264_ffmpeg video.dcm output.avi [mpeg1]\n");
         exit(1);
     }
+	char* compression;
+	if (argc >3){
+		compression = argv[3];
+	}else{
+		compression = (char*) "x264";
+	}
     
 
 	//DICOMIN VALMISTELUT
@@ -93,11 +99,19 @@ int main(int argc, char **argv)
 	}
 	fread(buffer,1,2,tie);		//Data tagin jälkeen on vielä OW taiOB
 	//Valmistellaan kuva ja näyttö
-	uint8_t * kuva[3];
 	
+	/*Single plane*/
+	/*
+	uint8_t * kuva[1];
+	kuva[0] = new uint8_t[videon_leveys*videon_korkeus*3];
+	*/
+	/*Three planes*/
+	
+	uint8_t * kuva[3];
 	kuva[0] = new uint8_t[videon_leveys*videon_korkeus];
 	kuva[1] = new uint8_t[videon_leveys*videon_korkeus];
 	kuva[2] = new uint8_t[videon_leveys*videon_korkeus];
+	
 	
 	//unsigned char* kuva;
 	
@@ -113,7 +127,7 @@ int main(int argc, char **argv)
 		
 	//DICOM VALMISTELTU
 	//x264 valmistelu
-	videoWriter ulosVideo(argv[2],videon_leveys,videon_korkeus,PIX_FMT_RGB24);
+	videoWriter ulosVideo(argv[2],videon_leveys,videon_korkeus,PIX_FMT_RGB24,compression);
 	//Lue seuraava DICOM-kuva
 	//Tähän silmukka kuvan hakemiselle
 	
@@ -215,7 +229,10 @@ int main(int argc, char **argv)
 			
 			//TALLENNETAAN VIDEOKSI...
 			//printf("Kuvaa tayttamaan\n");
-
+			
+			
+			/*Single plane*/
+			/*
 			for (int jjj = 0;jjj<videon_korkeus;jjj++){
 				for (int iii = 0;iii<videon_leveys;iii++){
 					kuva[0][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//R
@@ -223,6 +240,18 @@ int main(int argc, char **argv)
 					kuva[2][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja+2*riveja*kolumneja];;	//B
 					}
 			}
+			*/
+			
+			/*Three planes*/
+			
+			for (int jjj = 0;jjj<videon_korkeus;jjj++){
+				for (int iii = 0;iii<videon_leveys;iii++){
+					kuva[0][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//R
+					kuva[1][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//G
+					kuva[2][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//B
+					}
+			}
+			
 			//Kuva valmis
 			ulosVideo.write_video_frame(kuva);
 			printf("Kuva %u\r",kuvia_naytetty);
