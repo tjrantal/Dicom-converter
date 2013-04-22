@@ -101,17 +101,17 @@ int main(int argc, char **argv)
 	//Valmistellaan kuva ja näyttö
 	
 	/*Single plane*/
-	
+	/*
 	uint8_t* kuva;
 	kuva = (uint8_t*) malloc(sizeof(uint8_t)*videon_leveys*videon_korkeus*3);
-	
-	/*Three planes*/
-	/*
-	uint8_t * kuva[3];
-	kuva[0] = new uint8_t[videon_leveys*videon_korkeus];
-	kuva[1] = new uint8_t[videon_leveys*videon_korkeus];
-	kuva[2] = new uint8_t[videon_leveys*videon_korkeus];
 	*/
+	/*Three planes*/
+	
+	uint8_t * kuva[3];
+	kuva[0] = new uint8_t[(videon_leveys+16)*videon_korkeus];	//+16 for the needs of libavcodec, not necessarily needed...
+	kuva[1] = new uint8_t[(videon_leveys+16)*videon_korkeus];
+	kuva[2] = new uint8_t[(videon_leveys+16)*videon_korkeus];
+	
 	
 	//unsigned char* kuva;
 	
@@ -231,8 +231,8 @@ int main(int argc, char **argv)
 			//printf("Kuvaa tayttamaan\n");
 			
 			
-			/*Single plane, successive*/
-			
+			/*Single plane, packed*/
+			/*
 			for (int jjj = 0;jjj<videon_korkeus;jjj++){
 				for (int iii = 0;iii<videon_leveys;iii++){
 					if (iii < kolumneja && jjj < riveja){
@@ -247,7 +247,7 @@ int main(int argc, char **argv)
 					}
 				}
 			}
-			
+			*/
 			/*Single plane planar*/
 			/*
 			for (int jjj = 0;jjj<videon_korkeus;jjj++){
@@ -268,16 +268,16 @@ int main(int argc, char **argv)
 
 			
 			
-			/*Three planes*/
-			/*
+			/*Three planes AV_PIX_FMT_GBRP*/
+			
 			for (int jjj = 0;jjj<videon_korkeus;jjj++){
 				for (int iii = 0;iii<videon_leveys;iii++){
-					kuva[0][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//R
-					kuva[1][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//G
-					kuva[2][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//B
+					kuva[2][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja];	//R = 2
+					kuva[0][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja];	//G = 0
+					kuva[1][iii+jjj*(videon_leveys+16)]=vali[iii+jjj*kolumneja];	//B = 1
 					}
 			}
-			*/
+			
 			//Kuva valmis
 			ulosVideo.write_video_frame(kuva);
 			printf("Kuva %u\r",kuvia_naytetty);

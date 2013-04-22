@@ -30,7 +30,7 @@ class videoWriter
 		int video_outbuf_size;
 		const char* filename;
 		AVFrame *picture3;
-		AVFrame *rgbPict;
+		AVPicture *rgbPict;
 		AVPixelFormat src_pix_fmt;
 		AVPixelFormat formatIn;
 		int uleveys, ukorkeus,framesEncoded;
@@ -38,7 +38,7 @@ class videoWriter
 	public:
 		
 		//Function declarations
-		void write_video_frame(const uint8_t *imageIn);
+		void write_video_frame(const uint8_t *imageIn[]);
 		void write_trailer();
 		videoWriter(const char* fname, int lev, int kor, AVPixelFormat src_pix_fmtIn, char* compression) //Constructor
 		{
@@ -157,19 +157,19 @@ class videoWriter
 							   PIX_FMT_YUV420P, uleveys, ukorkeus);
 				picture3->pts = 0;
 				printf("Picture allocoitu\n");
-				rgbPict = avcodec_alloc_frame();
-				size = avpicture_get_size(src_pix_fmt, uleveys, ukorkeus);
+				avpicture_alloc(rgbPict,src_pix_fmt, uleveys, ukorkeus);
 				rgb_buf = (uint8_t*) av_malloc(size);
-				avpicture_fill((AVPicture *)rgbPict, rgb_buf,
+				avpicture_fill(rgbPict, rgb_buf,
 							   src_pix_fmt, uleveys, ukorkeus);
 				
 		}
 };
 
-void videoWriter::write_video_frame(const  uint8_t* imageIn)
+void videoWriter::write_video_frame(const  uint8_t* imageIn[])
 {
 	printf("start writing frame");
-	avpicture_fill((AVPicture *)rgbPict,imageIn,src_pix_fmt,uleveys,ukorkeus);
+	//avpicture_fill(rgbPict,imageIn,src_pix_fmt,uleveys,ukorkeus);
+	int linesize[] = {uleveys+16,uleveys+16,uleveys+16};
     int out_size, ret;
     AVCodecContext *c;
 //	const int linesize[1] = {uleveys*3};
@@ -179,12 +179,13 @@ void videoWriter::write_video_frame(const  uint8_t* imageIn)
 	//printf("PTS calculated\n");
 	if (formatIn != PIX_FMT_YUV420P) {
 		//printf("Start Scaling\n");	   
-		sws_scale(img_convert_ctx, rgbPict->data, rgbPict->linesize, 0, c->height, picture3->data, picture3->linesize);
+		//sws_scale(img_convert_ctx, rgbPict->data, rgbPict->linesize, 0, c->height, picture3->data, picture3->linesize);
+		sws_scale(img_convert_ctx, imageIn, linesize, 0, c->height, picture3->data, picture3->linesize);
 		//printf("Scaled successfully\n");	   		
 				
 
         } else {
-			avpicture_fill((AVPicture *)picture3, rgbPict->data[0], c->pix_fmt,
+			avpicture_fill((AVPicture *)picture3, *(imageIn), c->pix_fmt,
 				c->width, c->height);
 		}
     
