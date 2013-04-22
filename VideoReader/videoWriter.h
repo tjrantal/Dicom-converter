@@ -30,7 +30,7 @@ class videoWriter
 		int video_outbuf_size;
 		const char* filename;
 		AVFrame *picture3;
-		AVPicture rgbPict;
+		//AVPicture rgbPict;
 		AVPixelFormat src_pix_fmt;
 		AVPixelFormat formatIn;
 		int uleveys, ukorkeus,framesEncoded;
@@ -161,19 +161,21 @@ class videoWriter
 					printf("Couldn't alloc\n");
 					exit(0);				
 				}
+				/*
 				printf("RGB pict alloc\n",size);
 				size = avpicture_get_size(src_pix_fmt, uleveys, ukorkeus);
 				printf("RGB pict size %d\n",size);
 				rgb_buf = (uint8_t*) av_malloc(size);
 				avpicture_fill(&rgbPict, rgb_buf,
 							   src_pix_fmt, uleveys, ukorkeus);
+				*/
 				
 		}
 };
 
 void videoWriter::write_video_frame(uint8_t* imageIn[])
 {
-	printf("start writing frame");
+	//printf("start writing frame");
 	//avpicture_fill(&rgbPict,imageIn,src_pix_fmt,uleveys,ukorkeus);
 	const int linesize[3] = {uleveys+16,uleveys+16,uleveys+16};
     int out_size, ret;
