@@ -102,8 +102,8 @@ int main(int argc, char **argv)
 	
 	/*Single plane*/
 	
-	uint8_t * kuva[1];
-	kuva[0] = new uint8_t[videon_leveys*videon_korkeus*3];
+	uint8_t* kuva;
+	kuva = (uint8_t*) malloc(sizeof(uint8_t)*videon_leveys*videon_korkeus*3);
 	
 	/*Three planes*/
 	/*
@@ -231,31 +231,40 @@ int main(int argc, char **argv)
 			//printf("Kuvaa tayttamaan\n");
 			
 			
-			/*Single plane*/
-			/*
-			for (int jjj = 0;jjj<videon_korkeus;jjj++){
-				for (int iii = 0;iii<videon_leveys;iii++){
-					kuva[0][3*iii+jjj*videon_leveys*3]=vali[iii+jjj*kolumneja];	//R
-					kuva[0][3*iii+1+jjj*videon_leveys*3]=vali[iii+jjj*kolumneja+riveja*kolumneja];	//G
-					kuva[0][3*iii+2+jjj*videon_leveys*3]=vali[iii+jjj*kolumneja+2*riveja*kolumneja];;	//B
-					}
-			}
-			*/
-			/*Single plane planar*/
+			/*Single plane, successive*/
+			
 			for (int jjj = 0;jjj<videon_korkeus;jjj++){
 				for (int iii = 0;iii<videon_leveys;iii++){
 					if (iii < kolumneja && jjj < riveja){
-						kuva[0][iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//R
-						kuva[0][iii+jjj*videon_leveys+videon_leveys*videon_korkeus*1]=vali[iii+jjj*kolumneja+riveja*kolumneja];	//G
-						kuva[0][iii+jjj*videon_leveys+videon_leveys*videon_korkeus*2]=vali[iii+jjj*kolumneja+2*riveja*kolumneja];	//B
+						kuva[3*iii+jjj*videon_leveys*3]=vali[iii+jjj*kolumneja];	//R
+						kuva[3*iii+1+jjj*videon_leveys*3]=vali[iii+jjj*kolumneja+riveja*kolumneja];	//G
+						kuva[3*iii+2+jjj*videon_leveys*3]=vali[iii+jjj*kolumneja+2*riveja*kolumneja];	//B
 					
 					}else{
-						kuva[0][iii+jjj*videon_leveys]=0;	//R
-						kuva[0][iii+jjj*videon_leveys+videon_leveys*videon_korkeus*1]=0;	//G
-						kuva[0][iii+jjj*videon_leveys+videon_leveys*videon_korkeus*2]=0;	//B
+						kuva[3*iii+jjj*videon_leveys*3]	=0;	//R
+						kuva[3*iii+1+jjj*videon_leveys*3]	=0;	//G
+						kuva[3*iii+2+jjj*videon_leveys*3]	=0;	//B
 					}
 				}
 			}
+			
+			/*Single plane planar*/
+			/*
+			for (int jjj = 0;jjj<videon_korkeus;jjj++){
+				for (int iii = 0;iii<videon_leveys;iii++){
+					if (iii < kolumneja && jjj < riveja){
+						kuva[iii+jjj*videon_leveys]=vali[iii+jjj*kolumneja];	//R
+						kuva[iii+jjj*videon_leveys+videon_leveys*videon_korkeus*1]=vali[iii+jjj*kolumneja+riveja*kolumneja];	//G
+						kuva[iii+jjj*videon_leveys+videon_leveys*videon_korkeus*2]=vali[iii+jjj*kolumneja+2*riveja*kolumneja];	//B
+					
+					}else{
+						kuva[iii+jjj*videon_leveys]=0;	//R
+						kuva[iii+jjj*videon_leveys+videon_leveys*videon_korkeus*1]=0;	//G
+						kuva[iii+jjj*videon_leveys+videon_leveys*videon_korkeus*2]=0;	//B
+					}
+				}
+			}
+			*/
 
 			
 			
@@ -278,9 +287,7 @@ int main(int argc, char **argv)
 			
 	//Tässä on valmista, nollaillaan kaikki
 	ulosVideo.write_trailer();
-	for (int i = 0;i<3;++i){
-		delete kuva[i];
-	}
+	free(kuva);
 	delete vali;
 	fclose(tie);
 	printf("Valmista tuli\n"); 

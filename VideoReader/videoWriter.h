@@ -26,21 +26,24 @@ class videoWriter
 		uint8_t *video_outbuf;
 		uint8_t *picture_buf3;
 		uint8_t *picture_buf2;
+		uint8_t *rgb_buf;
 		int video_outbuf_size;
 		const char* filename;
 		AVFrame *picture3;
+		AVFrame *rgbPict;
+		AVPixelFormat src_pix_fmt;
 		AVPixelFormat formatIn;
 		int uleveys, ukorkeus,framesEncoded;
 		struct SwsContext *img_convert_ctx;
 	public:
 		
 		//Function declarations
-		void write_video_frame(const uint8_t *const* imageIn);
+		void write_video_frame(const uint8_t *imageIn);
 		void write_trailer();
-		videoWriter(const char* fname, int lev, int kor, AVPixelFormat src_pix_fmt, char* compression) //Constructor
+		videoWriter(const char* fname, int lev, int kor, AVPixelFormat src_pix_fmtIn, char* compression) //Constructor
 		{
 			    
-		
+				src_pix_fmt = src_pix_fmtIn;
 				uleveys = lev;
 				ukorkeus = kor;
 				framesEncoded = 0;
@@ -154,30 +157,34 @@ class videoWriter
 							   PIX_FMT_YUV420P, uleveys, ukorkeus);
 				picture3->pts = 0;
 				printf("Picture allocoitu\n");
+				rgbPict = avcodec_alloc_frame();
+				size = avpicture_get_size(src_pix_fmt, uleveys, ukorkeus);
+				rgb_buf = (uint8_t*) av_malloc(size);
+				avpicture_fill((AVPicture *)rgbPict, rgb_buf,
+							   src_pix_fmt, uleveys, ukorkeus);
+				
 		}
 };
 
-void videoWriter::write_video_frame(const  uint8_t *const* imageIn)
+void videoWriter::write_video_frame(const  uint8_t* imageIn)
 {
-	
+	printf("start writing frame");
+	avpicture_fill((AVPicture *)rgbPict,imageIn,src_pix_fmt,uleveys,ukorkeus);
     int out_size, ret;
     AVCodecContext *c;
-	const int linesize[1] = {uleveys*3};
-	/*
-	//Three planes
-	const int linesize[3] = {uleveys,uleveys,uleveys};
-	*/
+//	const int linesize[1] = {uleveys*3};
+
     c = video_st->codec;
 	double pts = (double)video_st->pts.val * video_st->time_base.num /video_st->time_base.den;
 	//printf("PTS calculated\n");
 	if (formatIn != PIX_FMT_YUV420P) {
 		//printf("Start Scaling\n");	   
-		sws_scale(img_convert_ctx, (const uint8_t * const*)imageIn, linesize, 0, c->height, picture3->data, picture3->linesize);
+		sws_scale(img_convert_ctx, rgbPict->data, rgbPict->linesize, 0, c->height, picture3->data, picture3->linesize);
 		//printf("Scaled successfully\n");	   		
 				
 
         } else {
-			avpicture_fill((AVPicture *)picture3, imageIn[0], c->pix_fmt,
+			avpicture_fill((AVPicture *)picture3, rgbPict->data[0], c->pix_fmt,
 				c->width, c->height);
 		}
     
@@ -246,8 +253,9 @@ void videoWriter::write_trailer(){
 			}
 		}
 	}
-	
+	printf("Writing trailer");
 	av_write_trailer(oc);
+	printf("Closing file");
 	avio_close(oc->pb);// Close the output file. 
 	/*
     if (video_st){
